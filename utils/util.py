@@ -51,32 +51,33 @@ class Logger(object):
 class mnist_data_cfg_default:
     classes = 10
     shape = (1, 28, 28)
-    # normalize = True
     mean = (0.13066047430038452, )
     std = (0.30810782313346863,)
 
 class cifar10_data_cfg_default:
     classes = 10
     shape = (3, 32, 32)
-    # normalize = True
     mean = (0.4914, 0.4822, 0.4465)
     std = (0.247, 0.243, 0.261)
-
 
 class imagenet_data_cfg_default:
     classes = 1000
     shape = (3, 224, 224)
-    # normalize = True
     mean = (0.485, 0.456, 0.406)
     std = (0.229, 0.224, 0.225)
 
 class skin_data_cfg_default:
     classes = 7
     shape = (3, 224, 224)
-    # normalize = True
     mean = (0.763, 0.546, 0.570)
     std = (0.141, 0.153, 0.170)
 
+class celeba32_data_cfg_default:
+    classes = 2
+    shape = (3, 32, 32)
+    # normalize = True
+    mean = (0.5, 0.5, 0.5)
+    std = (0.5, 0.5, 0.5)
 
 class attack_cfg_default:
     type = "analytic"

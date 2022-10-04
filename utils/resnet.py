@@ -410,7 +410,8 @@ class ResNet_imp(nn.Module):
 
     def _forward_impl(self, input: Tensor) -> Tensor:
         # See note [TorchScript super()]
-        x = input[0].view(input[0].size(0), 3, 224, 224)
+        x = input[0].view(input[0].size(), 3, 224, 224)
+        # x = input[0].view(input[0].size(0), 3, 32, 32) # for celeba32
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)

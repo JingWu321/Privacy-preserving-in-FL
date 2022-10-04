@@ -7,7 +7,8 @@ from utils.util import (
     mnist_data_cfg_default,
     cifar10_data_cfg_default,
     skin_data_cfg_default,
-    imagenet_data_cfg_default
+    imagenet_data_cfg_default,
+    celeba32_data_cfg_default,
     )
 from .base.imprint import ImprintBlock, SparseImprintBlock
 from .base.analytic_attack import ImprintAttacker
@@ -89,8 +90,10 @@ def Imprint_setting(args, model, loss_fn, setup):
         data_cfg_default = cifar10_data_cfg_default
     elif args.dataset == 'HAM10000':
         data_cfg_default = skin_data_cfg_default
-    elif args.dataset == 'ImageNet':
+    elif args.dataset == 'ImageNet' or args.dataset == 'CelebA':
         data_cfg_default = imagenet_data_cfg_default
+    elif args.dataset == 'CelebA32':
+        data_cfg_default = celeba32_data_cfg_default
 
     # Load imprint module
     input_dim = data_cfg_default.shape[0] * data_cfg_default.shape[1] * data_cfg_default.shape[2]
