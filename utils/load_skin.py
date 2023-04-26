@@ -147,10 +147,3 @@ class CustomDataset(Dataset):
 # print(normMean, normStd)
 # normMean = [0.76303315, 0.5456393, 0.57004255]
 # normStd = [0.14092793, 0.15261298, 0.16997057]
-
-# import resnet
-# model = resnet.resnet18(pretrained=False)
-# fc = getattr(model, 'fc')
-# feature_dim = fc.in_features
-# setattr(model,'fc', torch.nn.Linear(feature_dim, 7))
-# print(model)
