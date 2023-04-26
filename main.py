@@ -22,8 +22,10 @@ from utils.net import (
     LeNet_MNIST, LeNet_MNIST_imp,
     ConvNet, ConvNet_imp)
 from utils.metric import psnr, ssim_batch, lpips_loss
+from utils.resnet import resnet18, resnet18_imp
 from defense import defenses_para
 from attack import attacks
+from utils.load_celeba import CelebA
 
 
 def get_args_parser():
@@ -107,6 +109,49 @@ def load_data(args, dataset=None, batch_size=None):
                            transform=data_transform)
         testset = CIFAR10(root=args.root, train=False, download=True,
                           transform=data_transform)
+    elif args.dataset == 'CelebA':
+        data_mean = (0.5, 0.5, 0.5)
+        data_std = (0.5, 0.5, 0.5)
+        normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
+                                         std=[0.5, 0.5, 0.5])
+        # trainset = CelebA(root=args.root + '/' + 'CelebA', split='test', download=False,
+        #                   transform=transforms.Compose([
+        #                     transforms.Resize(32),
+        #                     transforms.CenterCrop(32),
+        #                     transforms.ToTensor(),
+        #                     normalize,
+        #                   ]),
+        #                   target_transform=transforms.Lambda(lambda target: target[20]),)
+        # testset = CelebA(root=args.root + '/' + 'CelebA', split='test', download=False,
+        #                   transform=transforms.Compose([
+        #                     transforms.Resize(32),
+        #                     transforms.CenterCrop(32),
+        #                     transforms.ToTensor(),
+        #                     normalize,
+        #                   ]),
+        #                   target_transform=transforms.Lambda(lambda target: target[20]),)
+        # data_mean = (0.485, 0.456, 0.406)
+        # data_std = (0.229, 0.224, 0.225)
+        # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+        #                                  std=[0.229, 0.224, 0.225])
+        trainset = CelebA(root=args.root + '/CelebA', train=False,
+                          transform=transforms.Compose([
+                            # transforms.RandomResizedCrop(224),
+                            # transforms.RandomHorizontalFlip(),
+                            transforms.Resize(32),
+                            transforms.CenterCrop(32),
+                            transforms.ToTensor(),
+                            normalize,
+                          ]))
+        testset = CelebA(root=args.root + '/CelebA', train=False,
+                         transform=transforms.Compose([
+                            # transforms.RandomResizedCrop(224),
+                            # transforms.RandomHorizontalFlip(),
+                            transforms.Resize(32),
+                            transforms.CenterCrop(32),
+                           transforms.ToTensor(),
+                           normalize,
+                          ]))
     else:
         assert False, 'not support the dataset yet.'
 
@@ -155,6 +200,21 @@ def load_model(args, setup):
                     args, model, loss_fn, setup)
         else:
             model = ConvNet(width=32, num_classes=10, num_channels=3)
+    elif args.dataset == 'CelebA':
+        if args.attack == 'imprint':
+            model = resnet18_imp(pretrained=args.pretrained)
+            fc = getattr(model, 'fc')
+            feature_dim = fc.in_features
+            setattr(model,'fc', torch.nn.Linear(feature_dim, 2))
+            if args.trained > 0:
+                model, attacker, server_payload, secrets = attacks.Imprint_setting(
+                    args, model, loss_fn, setup)
+        else:
+            model = resnet18(pretrained=args.pretrained)
+            fc = getattr(model, 'fc')
+            feature_dim = fc.in_features
+            setattr(model,'fc', torch.nn.Linear(feature_dim, 2))
+        # loss_fn = torch.nn.CrossEntropyLoss(weight=torch.FloatTensor([1, 20]).to(**setup))
     model.to(**setup)
     optimizer_model = torch.optim.SGD(model.parameters(), lr=0.01,
                                       momentum=0.9)
